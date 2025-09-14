@@ -75,35 +75,49 @@ Linear scaling up to 100+ nodes
 **NLP:** Large language model training and fine-tuning
 
 ## Quick Start
-```bash
+
+### Clone repository
 ```
-# Clone repository
 git clone https://github.com/anushahadagali/distributed-ml-platform.git
 cd distributed-ml-platform
+```
 
-# Set up environment
+### Set up environment
+```
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
 
-# Run example
+### Run example
+```
 python examples/mnist_distributed.py
+```
 
-# Create virtual environment
+### Create virtual environment
+```
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-# Install development dependencies
+### Install development dependencies
+```
 pip install --upgrade pip
+```
 
-# Install requirements-dev.txt since you're developing, 
+### Install requirements-dev.txt since you're developing
+``` 
 pip install -r requirements-dev.txt 
 pip install -r requirements.txt
+```
 
-# Set up pre-commit hooks
+### Set up pre-commit hooks
+```
 pre-commit install
+```
 
-# Test the Basic Setup
+### Test the Basic Setup
+```
 #Install basic dependencies first
 pip install torch torchvision pyyaml
 
@@ -115,7 +129,7 @@ pip install -e
 pip install grpcio-tools
 python scripts/generate_proto.py
 python examples/basic_example.py
-
+```
 
 # 13/sept/2025 What We've Done So Far
 ## Project Foundation:
