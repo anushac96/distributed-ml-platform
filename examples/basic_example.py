@@ -1,3 +1,7 @@
+# What: Demo showing system startup and communication
+# Why: Proves the distributed system works
+# When: Run by developers to test the system
+
 import asyncio
 import logging
 from src.master.coordinator import MasterCoordinator

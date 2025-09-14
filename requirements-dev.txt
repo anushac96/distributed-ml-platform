@@ -1,3 +1,7 @@
+# What: Development tools + production dependencies
+# Why: Developers need testing/linting tools
+# When: Local development, testing pipelines
+
 -r requirements.txt
 pytest>=7.0.0
 pytest-asyncio>=0.19.0

@@ -1,3 +1,7 @@
+# What: Configuration management system
+# Why: Centralized config prevents hardcoded values
+# When: Called at startup by all components to load settings
+
 import os
 import yaml
 from dataclasses import dataclass

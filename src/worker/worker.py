@@ -1,3 +1,7 @@
+# What: Individual compute node that executes training
+# Why: Parallel processing across multiple machines
+# When: Started on each compute node, reports to master
+
 import asyncio
 import logging
 import torch

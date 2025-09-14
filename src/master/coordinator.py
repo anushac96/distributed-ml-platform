@@ -1,3 +1,7 @@
+# What: Central orchestrator managing workers and jobs
+# Why: Distributed systems need coordination and fault tolerance
+# When: Runs continuously as main service, workers register with it
+
 import asyncio
 import logging
 from typing import Dict, List

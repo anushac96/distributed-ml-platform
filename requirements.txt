@@ -1,3 +1,6 @@
+# What: Production dependencies only
+# Why: Clean production deployments without dev tools
+# When: Used by Docker, CI/CD, production servers
 torch>=1.12.0
 torchvision>=0.13.0
 grpcio>=1.47.0
