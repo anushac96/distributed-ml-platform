@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package distributedml;
+
+service WorkerService {
+  rpc StartTraining(TrainingTask) returns (TrainingResponse);
+  rpc StopTraining(StopRequest) returns (StopResponse);
+  rpc GetStatus(StatusRequest) returns (WorkerStatusResponse);
+}
+
+message TrainingTask {
+  string job_id = 1;
+  string model_config = 2;
+  repeated string data_files = 3;
+  TrainingParameters params = 4;
+}
+
+message TrainingParameters {
+  int32 batch_size = 1;
+  float learning_rate = 2;
+  int32 epochs = 3;
+}
+
+message TrainingResponse {
+  bool accepted = 1;
+  string message = 2;
+}
+
+message StopRequest {
+  string job_id = 1;
+}
+
+message StopResponse {
+  bool stopped = 1;
+}
+
+message StatusRequest {
+  string worker_id = 1;
+}
+
+message WorkerStatusResponse {
+  string worker_id = 1;
+  string current_job = 2;
+  float progress = 3;
+  string status = 4;
+}

@@ -1,6 +1,9 @@
 # What: Configuration management system
 # Why: Centralized config prevents hardcoded values
 # When: Called at startup by all components to load settings
+# You're seeing the same settings in two places:
+#  - In the .py file (config.py) — as default values inside the @dataclass definitions
+# - In the .yaml file — where you can override the defaults with custom settings
 
 import os
 import yaml

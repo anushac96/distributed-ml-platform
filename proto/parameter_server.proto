@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package distributedml;
+
+service ParameterServerService {
+  rpc PushGradients(GradientUpdate) returns (PushResponse);
+  rpc PullParameters(PullRequest) returns (ParameterUpdate);
+  rpc RegisterWorker(ServerRegistrationRequest) returns (ServerRegistrationResponse);
+}
+
+message GradientUpdate {
+  string worker_id = 1;
+  string layer_name = 2;
+  bytes gradient_data = 3;
+  int64 version = 4;
+}
+
+message PushResponse {
+  bool success = 1;
+  int64 new_version = 2;
+}
+
+message PullRequest {
+  string worker_id = 1;
+  string layer_name = 2;
+  int64 current_version = 3;
+}
+
+message ParameterUpdate {
+  string layer_name = 1;
+  bytes parameter_data = 2;
+  int64 version = 3;
+  bool has_update = 4;
+}
+
+message ServerRegistrationRequest {
+  string worker_id = 1;
+}
+
+message ServerRegistrationResponse {
+  bool success = 1;
+  repeated string available_layers = 2;
+}

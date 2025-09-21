@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package distributedml;
+
+// Service definition
+service MasterService {
+  rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse);
+  rpc SendHeartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  rpc RequestJob(JobRequest) returns (JobResponse);
+  rpc CompleteJob(JobCompleteRequest) returns (JobCompleteResponse);
+}
+
+// Message definitions
+message RegisterWorkerRequest {
+  string worker_id = 1;
+  WorkerCapabilities capabilities = 2;
+  string host = 3;
+  int32 port = 4;
+}
+
+message RegisterWorkerResponse {
+  bool success = 1;
+  string message = 2;
+  string assigned_worker_id = 3;
+}
+
+message WorkerCapabilities {
+  bool gpu_enabled = 1;
+  int32 max_batch_size = 2;
+  string device_type = 3;
+  repeated string supported_models = 4;
+}
+
+message HeartbeatRequest {
+  string worker_id = 1;
+  WorkerStatus status = 2;
+  int64 timestamp = 3;
+}
+
+message HeartbeatResponse {
+  bool acknowledged = 1;
+  repeated string pending_commands = 2;
+}
+
+message WorkerStatus {
+  string current_job_id = 1;
+  float cpu_usage = 2;
+  float memory_usage = 3;
+  float gpu_usage = 4;
+  int32 completed_batches = 5;
+}
+
+message JobRequest {
+  string worker_id = 1;
+}
+
+message JobResponse {
+  bool has_job = 1;
+  TrainingJob job = 2;
+}
+
+message TrainingJob {
+  string job_id = 1;
+  string model_type = 2;
+  TrainingConfig config = 3;
+  repeated string data_shards = 4;
+}
+
+message TrainingConfig {
+  int32 batch_size = 1;
+  float learning_rate = 2;
+  int32 epochs = 3;
+  string optimizer = 4;
+}
+
+message JobCompleteRequest {
+  string worker_id = 1;
+  string job_id = 2;
+  JobResult result = 3;
+}
+
+message JobCompleteResponse {
+  bool acknowledged = 1;
+  string next_job_id = 2;
+}
+
+message JobResult {
+  bool success = 1;
+  string error_message = 2;
+  int32 batches_processed = 3;
+  float final_loss = 4;
+  float accuracy = 5;
+}
