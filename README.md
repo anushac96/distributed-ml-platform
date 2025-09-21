@@ -152,6 +152,13 @@ Phase 1:
 Phase 1: python tests/test_phase1.py
 ```
 
+Phase 2:
+
+```
+python -m grpc_tools.protoc --proto_path=proto --python_out=src/generated --grpc_python_out=src/generated proto/parameter_server.proto
+python examples/ml_training_example.py
+```
+
 ```
 python examples/mnist_distributed.py
 ```

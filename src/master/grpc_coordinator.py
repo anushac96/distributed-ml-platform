@@ -14,12 +14,17 @@ logger = logging.getLogger(__name__)
 
 class MasterServicer(master_pb2_grpc.MasterServiceServicer):
     """gRPC service implementation"""
-    
+
     def __init__(self, coordinator):
         self.coordinator = coordinator
-    
-    def RegisterWorker(self, request, context):
-        """Handle worker registration"""
+
+    async def RegisterWorker(self, request, context):
+        """Handle worker registration (async to use coordinator helper)
+
+        Use the coordinator.register_worker helper so registration always
+        initializes 'status' and 'last_heartbeat' and avoids KeyError in
+        monitor_workers.
+        """
         try:
             worker_info = {
                 'host': request.host,
@@ -30,30 +35,31 @@ class MasterServicer(master_pb2_grpc.MasterServiceServicer):
                     'device_type': request.capabilities.device_type,
                 }
             }
-            
-            # Register synchronously - NO asyncio.create_task!
-            self.coordinator.workers[request.worker_id] = worker_info
+
+            # Use the coordinator's async helper to ensure consistent state
+            await self.coordinator.register_worker(request.worker_id, worker_info)
             logger.info(f"Registered worker: {request.worker_id}")
-            
+
             return master_pb2.RegisterWorkerResponse(
                 success=True,
                 message=f"Worker {request.worker_id} registered",
-                assigned_worker_id=request.worker_id
+                assigned_worker_id=request.worker_id,
             )
-            
+
         except Exception as e:
             logger.error(f"Registration error: {e}")
             return master_pb2.RegisterWorkerResponse(
                 success=False,
                 message=str(e),
-                assigned_worker_id=""
+                assigned_worker_id="",
             )
-    
-    def SendHeartbeat(self, request, context):
+
+    async def SendHeartbeat(self, request, context):
         """Handle heartbeat"""
         worker_id = request.worker_id
-        
+
         if worker_id in self.coordinator.workers:
+            # Update heartbeat timestamp safely
             self.coordinator.workers[worker_id]['last_heartbeat'] = time.time()
             return master_pb2.HeartbeatResponse(acknowledged=True)
         else:
