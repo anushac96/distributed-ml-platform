@@ -167,37 +167,6 @@ Function
 - memory_usage (float): Current memory usage percentage (0.0 to 100.0)
 - current_jobs (int32): Number of jobs currently being processed
 
-<!-- ### Why Use This?
-
-- **Standardized Communication:** Everyone speaks the same language (defined by .proto)
-- **Efficiency:** Binary format is compact and fast
-- **Scalability:** Easy to add more workers or extend functionality
-
-### How to Use This?
-
-1. Install Protocol Buffers and gRPC libraries
-2. Compile the .proto file to generate code in your preferred language (Python, Go, etc.)
-3. Implement the server (master) and client (worker) logic using the generated code
-
-### Example Commands to Compile and Run
-
-```bash
-#Install basic dependencies first
-python -m pip install --upgrade pip
-python -m pip install grpcio grpcio-tools protobuf
-pip install torch torchvision pyyaml
-#Create the config directory and file
-mkdir -p config/local
-#Compile the proto file
-python -m grpc_tools.protoc --proto_path=proto --python_out=src/generated --grpc_python_out=src/generated proto/master.proto
-python scripts/generate_proto.py
-#Run the basic example
-pip install -e .
-python examples/basic_example.py
-```
-
-### Next Steps -->
-
 ## parameter_server.proto
 
 - This file defines a ParameterServerService for managing model parameters in a distributed ML setup.
