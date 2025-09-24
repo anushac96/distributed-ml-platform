@@ -40,3 +40,14 @@ config/local/*.yaml
 # Logs
 *.log
 logs/
+
+# Checkpoints
+# Ignore model checkpoints and metadata
+checkpoints/*.pt
+checkpoints/*.pth
+checkpoints/*.json
+
+# Data files
+# Common MNIST/ubyte files and compressed variants
+data/MNIST/*
+*.ubyte.gz

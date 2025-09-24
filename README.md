@@ -134,10 +134,7 @@ pre-commit install
 ### Run example
 
 ```bash
-# Compile the proto file
-pip install -e .
-python -m grpc_tools.protoc --proto_path=proto --python_out=src/generated --grpc_python_out=src/generated proto/master.proto
-python scripts/generate_proto.py
+
 ```
 
 Phase 1:
@@ -149,15 +146,26 @@ Phase 1:
 - End-to-end gRPC communication paths
 
 ```
-Phase 1: python tests/test_phase1.py
+Phase 1:
+python examples/grpc_example.py
+python tests/test_phase1.py
 ```
 
 Phase 2:
 
 ```
-python -m grpc_tools.protoc --proto_path=proto --python_out=src/generated --grpc_python_out=src/generated proto/parameter_server.proto
+# Compile the proto file
+pip install -e .
+python -m grpc_tools.protoc --proto_path=proto --python_out=src/generated --grpc_python_out=src/generated proto/master.proto
+python scripts/generate_proto.py
 python examples/ml_training_example.py
+python tests/test_phase2.py
 ```
+
+Phase 3:
+python -m grpc_tools.protoc --proto_path=proto --python_out=src/generated --grpc_python_out=src/generated proto/parameter_server.proto
+python example/production_ml_worker.py
+python tests/test_phase3.py
 
 ```
 python examples/mnist_distributed.py

@@ -194,6 +194,8 @@ class MLWorker:
         logger.info("Starting distributed training loop")
         
         for iteration in range(10):  # 10 training iterations
+            if not self.running:
+                break
             logger.info(f"Training iteration {iteration + 1}/10")
             
             # Generate dummy training data (simulating MNIST)
@@ -225,6 +227,8 @@ class MLWorker:
             
             logger.info(f"Completed iteration {iteration + 1}, Loss: {loss.item():.4f}")
             await asyncio.sleep(3)  # Wait between iterations
+
+            await asyncio.sleep(3)  # Simulate time delay for training
         
         logger.info("Distributed training completed")
     

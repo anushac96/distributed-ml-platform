@@ -21,6 +21,7 @@ class ParameterStorage:
         self.parameters: Dict[str, np.ndarray] = {}  # layer_name -> parameters
         self.gradients: Dict[str, list] = {}         # layer_name -> list of gradients
         self.versions: Dict[str, int] = {}           # layer_name -> version number
+        self.registered_workers = set() # Track registered workers
     
     def initialize_layer(self, layer_name: str, shape: tuple):
         """Initialize parameters for a layer"""
@@ -74,7 +75,7 @@ class ParameterServerServicer(parameter_server_pb2_grpc.ParameterServerServiceSe
     def RegisterWorker(self, request, context):
         """Register worker - using YOUR message names"""
         worker_id = request.worker_id
-        self.registered_workers.add(worker_id)
+        self.storage.registered_workers.add(worker_id)
         logger.info(f"Registered worker {worker_id} with parameter server")
         
         return parameter_server_pb2.ServerRegistrationResponse(
