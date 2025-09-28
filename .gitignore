@@ -50,4 +50,3 @@ checkpoints/*.json
 # Data files
 # Common MNIST/ubyte files and compressed variants
 data/MNIST/*
-*.ubyte.gz

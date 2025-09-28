@@ -8,6 +8,8 @@ import numpy as np
 import logging
 from typing import Iterator, Optional, List
 import asyncio
+import re
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -16,31 +18,60 @@ class DistributedSampler(Sampler):
     
     def __init__(self, dataset, worker_id: str, num_workers: int, shuffle: bool = True):
         self.dataset = dataset
-        self.worker_id = int(worker_id.split('_')[-1])  # Extract worker number
-        self.num_workers = num_workers
+
+        # Ensure num_workers is a sane int
+        try:
+            self.num_workers = max(1, int(num_workers))
+        except Exception:
+            self.num_workers = 1
+
+        # Parse worker_id robustly:
+        # - trailing digits => use numeric suffix
+        # - trailing hex (UUID-like) => use hex prefix
+        # - fallback to hashed value mod num_workers
+        worker_index = 0
+        try:
+            if worker_id is None:
+                worker_id = "0"
+            s = str(worker_id)
+            m = re.search(r'(\d+)$', s)
+            if m:
+                worker_index = int(m.group(1)) % self.num_workers
+            else:
+                m2 = re.search(r'([0-9a-fA-F]{1,16})$', s)
+                if m2:
+                    worker_index = int(m2.group(1)[:8], 16) % self.num_workers
+                else:
+                    worker_index = abs(hash(s)) % self.num_workers
+        except Exception:
+            worker_index = 0
+
+        self.worker_id = int(worker_index)
         self.shuffle = shuffle
         self.epoch = 0
         
         # Calculate data split for this worker
         self.total_size = len(dataset)
-        self.per_worker = self.total_size // self.num_workers
-        self.start_idx = self.worker_id * self.per_worker
-        self.end_idx = min(self.start_idx + self.per_worker, self.total_size)
-        
-        logger.info(f"Worker {worker_id} assigned data indices {self.start_idx}:{self.end_idx}")
-    
+
+        # Use ceil split so last worker gets remainder; avoid per_worker == 0
+        self.per_worker = max(1, math.ceil(self.total_size / self.num_workers)) if self.total_size > 0 else 0
+        self.start_idx = min(self.worker_id * self.per_worker, self.total_size)
+        self.end_idx = min((self.worker_id + 1) * self.per_worker, self.total_size)
+         
+        logger.info(f"Worker {worker_id} (index={self.worker_id}) assigned data indices {self.start_idx}:{self.end_idx}")
+
     def __iter__(self) -> Iterator[int]:
         indices = list(range(self.start_idx, self.end_idx))
-        
+         
         if self.shuffle:
             # Use worker_id as seed for consistent but different shuffling
             np.random.seed(self.epoch + self.worker_id)
             np.random.shuffle(indices)
-        
+         
         return iter(indices)
     
     def __len__(self) -> int:
-        return self.end_idx - self.start_idx
+        return max(0, self.end_idx - self.start_idx)
     
     def set_epoch(self, epoch: int):
         self.epoch = epoch
@@ -100,8 +131,8 @@ class MNISTDataModule:
             self.train_dataset,
             batch_size=self.batch_size,
             sampler=sampler,
-            num_workers=2,  # DataLoader worker threads
-            pin_memory=True
+            num_workers=0,  # DataLoader worker threads
+            pin_memory=torch.cuda.is_available()
         )
     
     def get_test_dataloader(self) -> DataLoader:
@@ -117,7 +148,8 @@ class MNISTDataModule:
             self.test_dataset,
             batch_size=self.batch_size,
             shuffle=False,
-            num_workers=2
+            num_workers=0,
+            pin_memory=False  # Disable pin_memory
         )
 
 class CIFAR10DataModule:
@@ -182,6 +214,6 @@ class CIFAR10DataModule:
             self.train_dataset,
             batch_size=self.batch_size,
             sampler=sampler,
-            num_workers=2,
-            pin_memory=True
+            num_workers=2,  # DataLoader worker threads
+            pin_memory=torch.cuda.is_available()  # Only pin memory if GPU available
         )
